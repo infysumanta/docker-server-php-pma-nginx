@@ -5,25 +5,25 @@ services:
     env_file: .env
     build:
       context: ./etc/php
-    container_name: ${APP_NAME}_php
+    container_name: docker_php
     entrypoint: sh /bin/entrypoint.sh php-fpm
     restart: always
     volumes:
       - './etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini'
       - './etc/php/entrypoint.sh:/bin/entrypoint.sh'
-      - ${APP_PATH}:/var/www
+      - ./app:/var/www
     links:
       - db:mysql
     expose:
       - 9000
   db:
     image: mysql:8
-    container_name: ${APP_NAME}_db
+    container_name: docker_db
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: db
+      MYSQL_USER: db
+      MYSQL_PASSWORD: db
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - './etc/db/data:/var/lib/mysql'
     command:
@@ -34,7 +34,7 @@ services:
       ]
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: ${APP_NAME}_pma
+    container_name: docker_pma
     ports:
       - 5426:80
     links:
@@ -44,18 +44,18 @@ services:
   nodejs:
     env_file: .env
     build: ./etc/nodejs
-    container_name: ${APP_NAME}_nodejs
+    container_name: docker_nodejs
     restart: 'no'
     entrypoint: sh /bin/entrypoint.sh
     volumes:
-      - ${APP_PATH}:/var/www/html
+      - ./app:/var/www/html
       - ./etc/nodejs/entrypoint.sh:/bin/entrypoint.sh
   apache:
     env_file: .env
     build: ./etc/httpd
     volumes:
       - './etc/httpd/httpd.conf:/usr/local/apache2/conf/httpd.conf'
-      - ${APP_PATH}:/var/www
+      - ./app:/var/www
     depends_on:
       - php
     expose:
@@ -63,7 +63,7 @@ services:
   web:
     env_file: .env
     build: etc/nginx
-    container_name: ${APP_NAME}_nginx
+    container_name: docker_nginx
     ports:
       - 80:80
     restart: always
@@ -72,6 +72,6 @@ services:
       - './etc/nginx/app.conf:/etc/nginx/sites-available/application.conf'
       - './etc/nginx/app.conf:/etc/nginx/sites-enabled/application'
       - './etc/log/nginx:/var/log/nginx'
-      - ${APP_PATH}:/var/www
+      - ./app:/var/www
     depends_on:
       - apache
