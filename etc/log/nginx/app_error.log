@@ -1,0 +1,1 @@
+2023/07/08 10:59:10 [error] 7#7: *1 open() "/var/www/web/favicon.ico" failed (2: No such file or directory), client: 172.19.0.1, server: , request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "http://localhost/"
